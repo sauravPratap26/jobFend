@@ -8,18 +8,22 @@ import { useState } from "react";
 import axios from "axios";
 import { USER_API_END_POINT } from "@/utils/constant";
 import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
+import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
+import { setLoading } from "@/redux/authSlice";
 
 const Signup = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const loading = useAppSelector((state) => state.auth.loading);
   const [input, setInput] = useState({
     fullName: "",
     email: "",
     phoneNumber: "",
     password: "",
     role: "",
-    file: null as File | null,  // File | null type for file field
+    file: null as File | null, // File | null type for file field
   });
-  
 
   const changeEventHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput({
@@ -29,21 +33,21 @@ const Signup = () => {
   };
 
   const changeFileHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-  if (e.target.files?.[0]) {
-    console.log(e.target.files)
-    setInput({
-      ...input,
-      file: e.target.files[0], // Store the actual File object here
-    });
-  }
-};
-
+    if (e.target.files?.[0]) {
+      console.log(e.target.files);
+      setInput({
+        ...input,
+        file: e.target.files[0], // Store the actual File object here
+      });
+    }
+  };
 
   const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log({ input });
 
     try {
+      dispatch(setLoading(true));
       const formData = new FormData();
       formData.append("fullName", input.fullName);
       formData.append("email", input.email);
@@ -63,12 +67,12 @@ const Signup = () => {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-          withCredentials:true
+          withCredentials: true,
         }
       );
 
       if (response.data.success) {
-        navigate("/login")
+        navigate("/login");
         toast.success(response.data.message);
       }
       console.log("Response:", response.data); // Log the response data
@@ -85,7 +89,9 @@ const Signup = () => {
         // Other errors
         console.error("Error Message:", error.message);
       }
-      toast.error(error.response.data.message)
+      toast.error(error.response.data.message);
+    } finally {
+      dispatch(setLoading(false));
     }
   };
 
@@ -175,9 +181,16 @@ const Signup = () => {
               />
             </div>
           </div>
-          <Button type="submit" className=" w-full my-4">
-            SignUp
-          </Button>
+          {loading ? (
+            <Button className=" w-full my-4">
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Please wait
+            </Button>
+          ) : (
+            <Button type="submit" className=" w-full my-4">
+              Signup
+            </Button>
+          )}
           <span className="text-sm">
             Already have an account?{" "}
             <Link to="/login" className="text-blue-600">

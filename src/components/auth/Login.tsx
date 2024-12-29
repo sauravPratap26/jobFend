@@ -8,9 +8,13 @@ import { useState } from "react";
 import axios from "axios";
 import { USER_API_END_POINT } from "@/utils/constant";
 import { toast } from "sonner";
+import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
+import { setLoading } from "@/redux/authSlice";
+import { Loader2 } from "lucide-react";
 
 const Login = () => {
-
+  const dispatch = useAppDispatch();
+  const loading = useAppSelector((state) => state.auth.loading);
   const [input, setInput] = useState({
     email: "",
     password: "",
@@ -28,11 +32,11 @@ const Login = () => {
     console.log({ input });
 
     try {
+      dispatch(setLoading(true));
       const formData = new FormData();
       formData.append("email", input.email);
       formData.append("password", input.password);
       formData.append("role", input.role);
-
 
       const response = await axios.post(
         `${USER_API_END_POINT}/login`,
@@ -61,7 +65,9 @@ const Login = () => {
         // Other errors
         console.error("Error Message:", error.message);
       }
-      toast.error(error.response.data.message)
+      toast.error(error.response.data.message);
+    } finally {
+      dispatch(setLoading(false));
     }
   };
   return (
@@ -120,9 +126,17 @@ const Login = () => {
               </div>
             </RadioGroup>
           </div>
-          <Button type="submit" className=" w-full my-4">
-            Login
-          </Button>
+          {loading ? (
+            <Button className=" w-full my-4">
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Please wait
+            </Button>
+          ) : (
+            <Button type="submit" className=" w-full my-4">
+              Login
+            </Button>
+          )}
+
           <span className="text-sm">
             Don't have an account?{" "}
             <Link to="/signup" className="text-blue-600">
