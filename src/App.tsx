@@ -7,11 +7,11 @@ import Home from "./components/Home";
 const appRouter = createBrowserRouter([
   { path: "/login", element: <Login /> },
   {
-    path: "signup",
+    path: "/signup",
     element: <Signup />,
   },
   {
-    path: "home",
+    path: "/home",
     element: <Home />,
   },
 ]);
