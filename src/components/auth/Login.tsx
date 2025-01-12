@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../shared/Navbar";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -14,6 +14,7 @@ import { Loader2 } from "lucide-react";
 
 const Login = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const loading = useAppSelector((state) => state.auth.loading);
   const [input, setInput] = useState({
     email: "",
@@ -50,6 +51,7 @@ const Login = () => {
 
       if (response.data.success) {
         toast.success(response.data.message);
+        navigate('/')
       }
       console.log("Response:", response.data); // Log the response data
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
